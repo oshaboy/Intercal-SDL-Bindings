@@ -115,7 +115,7 @@ ICK_EC_FUNC_END
 
 ICK_EC_FUNC_START(ick_SDL_DestroyWindow)
 	ick_linelabel(8010);
-	SDL_Window * window=getPoSDL_FreeSurfaceinter(WINDOW_TWOSPOT_PAIR);
+	SDL_Window * window=getPointer(WINDOW_TWOSPOT_PAIR);
 	SDL_DestroyWindow(window);
 ICK_EC_FUNC_END
 
@@ -180,14 +180,26 @@ blit_surface:
 	SDL_BlitSurface(surface, &srcrect , surface_to_blit, &destrect);
 	
 ICK_EC_FUNC_END
+
+ICK_EC_FUNC_START(ick_SDL_UpdateWindowSurface)
+	ick_linelabel(8017);
+	SDL_Window * window = getPointer(WINDOW_TWOSPOT_PAIR);
+	SDL_UpdateWindowSurface(window);
+
+ICK_EC_FUNC_END
+ICK_EC_FUNC_START(ick_SDL_Quit)
+	ick_linelabel(8018);
+	SDL_Quit();
+
+ICK_EC_FUNC_END
 ICK_EC_FUNC_START(ick_set_mem)
-	ick_linelabel(7000);
+	ick_linelabel(8500);
 	uint16_t index=ick_getonespot(1);
 	uint16_t value=ick_getonespot(2);
 	shared_mem[index]=value;
 ICK_EC_FUNC_END
 ICK_EC_FUNC_START(ick_get_mem)
-	ick_linelabel(7010);
+	ick_linelabel(8501);
 	uint16_t index=ick_getonespot(1);
 	ick_setonespot(1,shared_mem[index]);
 ICK_EC_FUNC_END

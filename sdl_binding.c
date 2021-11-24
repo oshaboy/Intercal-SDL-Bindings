@@ -13,6 +13,7 @@ uint16_t shared_mem[65536];
 #define WINDOW_SURFACE_TWOSPOT_PAIR 84
 #define SURFACE_DEST_TWOSPOT_PAIR 88
 #define SURFACE_TO_BLIT_TWOSPOT_PAIR 90
+#define TEXTURE_TWOSPOT_PAIR 92
 
 
 void * getPointer(int twospot_pair){
@@ -102,7 +103,10 @@ ICK_EC_FUNC_START(ick_SDL_PollEvent)
 	SDL_Event e;
 	int status=SDL_PollEvent(&e);
 	int index=ick_getonespot(1);
-	memcpy(shared_mem+index, &e, sizeof(SDL_Event));
+	int size=sizeof(SDL_Event);
+	if (index*2+size>=65536*2)
+		size=65536*2-index*2;
+	memcpy(shared_mem+index, &e, size);
 	ick_setonespot(1, status);
 	
         
@@ -176,10 +180,10 @@ blit_surface:
 	int16_t h=ick_getonespot(4);
 	srcrect=(SDL_Rect){.x=x,.y=y,.w=w,.h=h};
 	}
-	SDL_Rect destrect;
-	SDL_BlitSurface(surface, &srcrect , surface_to_blit, &destrect);
+	SDL_BlitSurface(surface, &srcrect , surface_to_blit, NULL);
 	
 ICK_EC_FUNC_END
+
 
 ICK_EC_FUNC_START(ick_SDL_UpdateWindowSurface)
 	ick_linelabel(8017);
@@ -192,6 +196,53 @@ ICK_EC_FUNC_START(ick_SDL_Quit)
 	SDL_Quit();
 
 ICK_EC_FUNC_END
+
+ICK_EC_FUNC_START(ick_SDL_CreateTexture)
+	ick_linelabel(8019);
+	SDL_Renderer * renderer = getPointer(RENDERER_TWOSPOT_PAIR);
+	uint32_t format=ick_gettwospot(1);
+	uint16_t access = ick_getonespot(1);
+	uint16_t width = ick_getonespot(2);
+	uint16_t height = ick_getonespot(3);
+	SDL_Texture * texture=SDL_CreateTexture(renderer,access, format, width, height);
+	setPointer(TEXTURE_TWOSPOT_PAIR, texture);
+
+ICK_EC_FUNC_END
+ICK_EC_FUNC_START(ick_SDL_CreateTextureFromSurface)
+	ick_linelabel(8020);
+	SDL_Renderer * renderer = getPointer(RENDERER_TWOSPOT_PAIR);
+	SDL_Surface * surface = getPointer(SURFACE_DEST_TWOSPOT_PAIR);
+	SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
+	setPointer(TEXTURE_TWOSPOT_PAIR, texture);
+ICK_EC_FUNC_END
+
+ICK_EC_FUNC_START(ick_SDL_DestroyTexture)
+	ick_linelabel(8021);
+	SDL_Texture * texture = getPointer(TEXTURE_TWOSPOT_PAIR);
+	SDL_DestroyTexture(texture);
+ICK_EC_FUNC_END
+
+ICK_EC_FUNC_START(ick_SDL_BlitScaled)
+	int twospot_pair;
+	ick_linelabel(8022);
+	twospot_pair=SURFACE_DEST_TWOSPOT_PAIR;
+	goto blit_surface;
+	ick_linelabel(8023);
+	twospot_pair=WINDOW_SURFACE_TWOSPOT_PAIR;
+blit_surface:
+	SDL_Surface * surface = getPointer(twospot_pair);
+	SDL_Surface * surface_to_blit = getPointer(SURFACE_TO_BLIT_TWOSPOT_PAIR);
+	SDL_Rect srcrect;
+	{
+	int16_t x=ick_getonespot(1);
+	int16_t y=ick_getonespot(2);
+	int16_t w=ick_getonespot(3);
+	int16_t h=ick_getonespot(4);
+	srcrect=(SDL_Rect){.x=x,.y=y,.w=w,.h=h};
+	}
+	SDL_BlitScaled(surface, &srcrect , surface_to_blit, NULL);
+ICK_EC_FUNC_END
+	
 ICK_EC_FUNC_START(ick_set_mem)
 	ick_linelabel(8500);
 	uint16_t index=ick_getonespot(1);
@@ -203,6 +254,14 @@ ICK_EC_FUNC_START(ick_get_mem)
 	uint16_t index=ick_getonespot(1);
 	ick_setonespot(1,shared_mem[index]);
 ICK_EC_FUNC_END
-
+ICK_EC_FUNC_START(ick_dump_struct)
+	ick_linelabel(8502);
+	int size=ick_getonespot(2);
+	uint16_t index=ick_getonespot(1);
+	void * structure=getPointer(1);
+	if (index+size>=65536)
+		size=65536-index;
+	memcpy(shared_mem+index, structure, size*2);
+ICK_EC_FUNC_END
 
 

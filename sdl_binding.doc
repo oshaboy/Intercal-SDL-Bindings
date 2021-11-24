@@ -1,20 +1,21 @@
 SM is 64K words shared between C and Intercal
 
-8500 - DO SM SUB .1 <- .2 
-8501 - DO .1 <- SM SUB .1
+8500 - DO *SM SUB .1 <- .2 
+8501 - DO .1 <- *SM SUB .1
+8502 - memcpy(SM SUB .1, :2|:1, .2*2) 
 
 8000 - SDL_Init()
-8001 - :83|:82 <- SDL_CreateWindow(SM SUB .10, w=.3, h=.4, x=.1, y=.2, flags=:1)
+8001 - :83|:82 <- SDL_CreateWindow(SM SUB .10, .3, .4, .1, .2, :1)
 8002 - SDL_Delay(:1)
 8003 - :85|:84 <- SDL_CreateRenderer(:83|:82, .1,:1)
 8004 - SDL_SetRenderDrawColor(:85|:84, .1,.2,.3,.4)
 8005 - SDL_RendererClear(:85|:84)
 8006 - SDL_RendererPresent(:85|:84)
 8007 - SDL_RenderDrawLine(:85|:84,.1,.2,.3,.4)
-8008 - .1 <- SDL_PollEvent(&SM SUB .1)
+8008 - .1 <- SDL_PollEvent(SM SUB .1)
 8009 - SDL_DestroyRenderer(:85|:84)
 8010 - SDL_DestroyWindow(:83|:82)
-8011 - :89|:88 <- SDL_CreateRGBSurfaceFrom(SM SUB .10, .1,.2,.3,.4,:1,:2,:3,:4)
+8011 - :89|:88 <- SDL_CreateRGBSurfaceFrom( .10, .1,.2,.3,.4,:1,:2,:3,:4)
 8012 - :85|:84 <- SDL_GetWindowSurface(:83|:82)
 8013 - SDL_FreeSurface(:89|:88)
 8014 - SDL_FreeSurface(:85|:84)
@@ -22,4 +23,8 @@ SM is 64K words shared between C and Intercal
 8016 - SDL_BlitSurface(:85|:84, {.x=.1,.y=.2,.w=.3,h=.4}, :91|:90, abyss)
 8017 - SDL_UpdateWindowSurface(:83|:82)
 8018 - SDL_Quit()
-
+8019 - :93|:92 <- SDL_CreateTexture(:85|:84, :1, .1, .2, .3)
+8020 - :93|:92 <- SDL_CreateTextureFromSurface(:85|:84, :89|:88)
+8021 - SDL_DestroyTexture(:93|:92)
+8022 - SDL_BlitScaled(:89|:88, {.x=.1,.y=.2,.w=.3,h=.4}, :91|:90, abyss)
+8023 - SDL_BlitScaled(:85|:84, {.x=.1,.y=.2,.w=.3,h=.4}, :91|:90, abyss)
